@@ -19,7 +19,7 @@ public class GumTreeRunner {
     public static void main(String[] args) throws IOException {
 
         //analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
-        analyzeRepo("C:\\Users\\Veit.ISYSINST\\Desktop\\projects\\Material-Animations");
+        analyzeRepo("/home/phmoll/Documents/RTED/LIRE");
 
 
 
@@ -46,6 +46,7 @@ public class GumTreeRunner {
         long startTime = System.currentTimeMillis();
         Repository repository = GitHelper.openRepository(repositoryPath);
         Collection<RevCommit> commits = GitHelper.getCommits(repository, "HEAD");
+        int i = 0;
         for (RevCommit commit : commits) {
             currentCommit++;
             System.out.println("Currently at commit " + currentCommit + " from " + commits.size() + " commits in total.");
@@ -85,6 +86,11 @@ public class GumTreeRunner {
 
                     stats.addEntry(gumTreeScore, rtedScore, changeDistillerScore);
                     System.out.println("Took: " + (System.currentTimeMillis() - startTime) + " ms");
+                    i++;
+
+                    if (i % 50 == 0) {
+                        stats.printStats();
+                    }
                 }
                 catch (Exception e){
                     System.out.println("Something somewhere went wrong. Ooopsi!");

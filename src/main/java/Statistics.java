@@ -27,10 +27,12 @@ public class Statistics {
                 rtedBetter++;
             }
         }
+        System.out.println("");
         System.out.println("-------------- GumTree vs. rTED --------------");
         System.out.println(String.format("GumTree better: %s (%f)", gumTreeBetter, gumTreeBetter / (double)entryList.size()));
         System.out.println(String.format("Equal: %s (%f)", equalValue, equalValue / (double)entryList.size()));
         System.out.println(String.format("RTED better: %s (%f)", rtedBetter, rtedBetter / (double)entryList.size()));
+        System.out.println("");
 
 
         // Compare changedistiller to gumtree
