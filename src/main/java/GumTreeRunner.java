@@ -88,7 +88,7 @@ public class GumTreeRunner {
                     System.out.println("Took: " + (System.currentTimeMillis() - startTime) + " ms");
                     i++;
 
-                    if (i % 50 == 0) {
+                    if (i % 10 == 0) {
                         stats.printStats();
                     }
                 }
