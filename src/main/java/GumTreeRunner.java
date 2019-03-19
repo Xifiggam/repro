@@ -20,15 +20,7 @@ public class GumTreeRunner {
 
     public static void main(String[] args) throws IOException {
 
-        String file1 = "inputfiles/GumTreeRunner.java";
-        String file2 = "inputfiles/GumTreeRunner_dst.java";
-
-        ITree srcTree = new JdtTreeGenerator().generateFromFile(file1).getRoot();
-        ITree dstTree = new JdtTreeGenerator().generateFromFile(file2).getRoot();
-        System.out.println("TED: " + RTEDCalculator.caclulateRTEDValue(srcTree, dstTree));
-
-        //System.out.println(runGumTree(srcTree, dstTree));
-        analyzeRepo("/home/phmoll/Documents/RTED/LIRE/", new JdtTreeGenerator());
+        analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
 
 
 
@@ -37,6 +29,10 @@ public class GumTreeRunner {
     public static int runGumTree(ITree srcTree, ITree dstTree){
         //Run.initGenerators();
         Matcher m = Matchers.getInstance().getMatcher(srcTree, dstTree); // retrieve the default matcher
+        return getEditscriptSize(m, srcTree, dstTree);
+    }
+
+    private static int getEditscriptSize(Matcher m, ITree srcTree, ITree dstTree) {
         m.match();
         ActionGenerator g = new ActionGenerator(srcTree, dstTree, m.getMappings());
         g.generate();
@@ -44,7 +40,7 @@ public class GumTreeRunner {
         return actions.size();
     }
 
-    public static void analyzeRepo(String repositoryPath, AbstractJdtTreeGenerator treeGenerator) throws IOException {
+    public static void analyzeRepo(String repositoryPath) throws IOException {
 
         Statistics stats = new Statistics();
 
@@ -72,7 +68,7 @@ public class GumTreeRunner {
                     //ITree srcTreeCD = new CdJdtTreeGenerator().generateFromString(srcString).getRoot();
                     //ITree dstTreeCD = new CdJdtTreeGenerator().generateFromString(dstString).getRoot();
 
-                    System.out.println(treeGenerator.getClass().getName() + " : " + repositoryPath + " : " + commit.getName() + " : " + diff.getOldPath());
+                    System.out.println(repositoryPath + " : " + commit.getName() + " : " + diff.getOldPath());
                     int gumTreeScore = runGumTree(srcTreeJdt, dstTreeJdt);
                     System.out.println("(JDT) GumTree: " + gumTreeScore);
                     double rtedScore = RTEDCalculator.caclulateRTEDValue(srcTreeJdt, dstTreeJdt);
@@ -96,13 +92,9 @@ public class GumTreeRunner {
     }
 
     private static int runChangeDistiller(ITree srcTree, ITree dstTree) {
-        //Run.initGenerators();
         Matcher m = new CompositeMatchers.ChangeDistiller(srcTree,dstTree, new MappingStore());
-        m.match();
-        ActionGenerator g = new ActionGenerator(srcTree, dstTree, m.getMappings());
-        g.generate();
-        List<Action> actions = g.getActions(); // return the actions
-        return actions.size();
+        return getEditscriptSize(m, srcTree, dstTree);
+
     }
 
 
