@@ -1,9 +1,6 @@
 import com.github.gumtreediff.actions.ActionGenerator;
 import com.github.gumtreediff.actions.model.Action;
-import com.github.gumtreediff.gen.TreeGenerator;
-import com.github.gumtreediff.gen.jdt.AbstractJdtTreeGenerator;
 import com.github.gumtreediff.gen.jdt.JdtTreeGenerator;
-import com.github.gumtreediff.gen.jdt.cd.CdJdtTreeGenerator;
 import com.github.gumtreediff.matchers.CompositeMatchers;
 import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
@@ -12,6 +9,7 @@ import com.github.gumtreediff.tree.ITree;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +19,7 @@ public class GumTreeRunner {
     public static void main(String[] args) throws IOException {
 
         analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
+        //analyzeRepo("C:\\Users\\Veit.ISYSINST\\Desktop\\projects\\spring-roo");
 
 
 
@@ -43,10 +42,13 @@ public class GumTreeRunner {
     public static void analyzeRepo(String repositoryPath) throws IOException {
 
         Statistics stats = new Statistics();
-
+        int currentCommit = 0;
+        long startTime = System.currentTimeMillis();
         Repository repository = GitHelper.openRepository(repositoryPath);
         Collection<RevCommit> commits = GitHelper.getCommits(repository, "HEAD");
         for (RevCommit commit : commits) {
+            currentCommit++;
+            System.out.println("Currently at commit " + currentCommit + " from " + commits.size() + " commits in total.");
             if(commit.getParents().length>1){
                 System.out.println("Merge commit ignored!");
                 continue;
@@ -70,15 +72,19 @@ public class GumTreeRunner {
 
                     System.out.println(repositoryPath + " : " + commit.getName() + " : " + diff.getOldPath());
                     int gumTreeScore = runGumTree(srcTreeJdt, dstTreeJdt);
+                    System.gc();
                     System.out.println("(JDT) GumTree: " + gumTreeScore);
                     double rtedScore = RTEDCalculator.caclulateRTEDValue(srcTreeJdt, dstTreeJdt);
+                    System.gc();
                     System.out.println("(JDT) RTED: " + rtedScore);
                     int changeDistillerScore = runChangeDistiller(srcTreeJdt, dstTreeJdt);
+                    System.gc();
                     System.out.println("(JDT) ChangeDistiller: " + changeDistillerScore);
                     //System.out.println("(CD) ChangeDistiller: " + runChangeDistiller(srcTreeCD, dstTreeCD));
                     //System.out.println("(CD) GumTree: " + runGumTree(srcTreeCD, dstTreeCD));
 
                     stats.addEntry(gumTreeScore, rtedScore, changeDistillerScore);
+                    System.out.println("Took: " + (startTime - System.currentTimeMillis()) + " ms");
                 }
                 catch (Exception e){
                     System.out.println("Something somewhere went wrong. Ooopsi!");
