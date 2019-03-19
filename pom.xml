@@ -18,6 +18,13 @@
             <artifactId>gen.jdt</artifactId>
             <version>2.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>rted</groupId>
+            <artifactId>rted</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/RTED_v1.1.jar</systemPath>
+        </dependency>
     </dependencies>
 
 </project>
