@@ -18,7 +18,7 @@ public class RTEDCalculator {
         return ted;
     }
 
-    private static String convertITreeToString(ITree tree) {
+    public static String convertITreeToString(ITree tree) {
 
         String pre = "{";
         String childs = "";
@@ -28,6 +28,6 @@ public class RTEDCalculator {
             childs += convertITreeToString(child);
         }
 
-        return pre + tree.getLabel() + childs + post;
+        return pre + tree.getId() + childs + post;
     }
 }
