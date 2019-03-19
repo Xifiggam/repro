@@ -59,7 +59,9 @@ public class GumTreeRunner {
                 String dstString = GitHelper.getFileContent(diff.getNewId(), repository);
                 ITree srcTree = new JdtTreeGenerator().generateFromString(srcString).getRoot();
                 ITree dstTree = new JdtTreeGenerator().generateFromString(dstString).getRoot();
-                System.out.println(treeGenerator.getClass().getName()+ " : " + repositoryPath + " : " + commit.getName()  + " : " +  diff.getOldPath() + " " +" Edit Distance: " + runGumTree(srcTree, dstTree));
+                System.out.println(treeGenerator.getClass().getName()+ " : " + repositoryPath + " : " + commit.getName()  + " : " +  diff.getOldPath());
+                System.out.println("GumTree: " + runGumTree(srcTree, dstTree));
+                System.out.println("RTED: " + RTEDCalculator.caclulateRTEDValue(srcTree, dstTree));
             }
 
         }
