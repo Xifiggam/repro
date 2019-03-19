@@ -18,8 +18,8 @@ public class GumTreeRunner {
 
     public static void main(String[] args) throws IOException {
 
-        analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
-        //analyzeRepo("C:\\Users\\Veit.ISYSINST\\Desktop\\projects\\spring-roo");
+        //analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
+        analyzeRepo("C:\\Users\\Veit.ISYSINST\\Desktop\\projects\\Material-Animations");
 
 
 
@@ -84,7 +84,7 @@ public class GumTreeRunner {
                     //System.out.println("(CD) GumTree: " + runGumTree(srcTreeCD, dstTreeCD));
 
                     stats.addEntry(gumTreeScore, rtedScore, changeDistillerScore);
-                    System.out.println("Took: " + (startTime - System.currentTimeMillis()) + " ms");
+                    System.out.println("Took: " + (System.currentTimeMillis() - startTime) + " ms");
                 }
                 catch (Exception e){
                     System.out.println("Something somewhere went wrong. Ooopsi!");
