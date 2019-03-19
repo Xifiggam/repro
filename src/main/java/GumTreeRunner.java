@@ -28,7 +28,7 @@ public class GumTreeRunner {
         System.out.println("TED: " + RTEDCalculator.caclulateRTEDValue(srcTree, dstTree));
 
         //System.out.println(runGumTree(srcTree, dstTree));
-        analyzeRepo("C:\\Users\\Veit.ISYSINST\\Desktop\\projects\\Material-Animations", new JdtTreeGenerator());
+        analyzeRepo("/home/phmoll/Documents/RTED/LIRE/", new JdtTreeGenerator());
 
 
 
@@ -45,6 +45,9 @@ public class GumTreeRunner {
     }
 
     public static void analyzeRepo(String repositoryPath, AbstractJdtTreeGenerator treeGenerator) throws IOException {
+
+        Statistics stats = new Statistics();
+
         Repository repository = GitHelper.openRepository(repositoryPath);
         Collection<RevCommit> commits = GitHelper.getCommits(repository, "HEAD");
         for (RevCommit commit : commits) {
@@ -66,15 +69,20 @@ public class GumTreeRunner {
                     ITree srcTreeJdt = new JdtTreeGenerator().generateFromString(srcString).getRoot();
                     ITree dstTreeJdt = new JdtTreeGenerator().generateFromString(dstString).getRoot();
 
-                    ITree srcTreeCD = new CdJdtTreeGenerator().generateFromString(srcString).getRoot();
-                    ITree dstTreeCD = new CdJdtTreeGenerator().generateFromString(dstString).getRoot();
+                    //ITree srcTreeCD = new CdJdtTreeGenerator().generateFromString(srcString).getRoot();
+                    //ITree dstTreeCD = new CdJdtTreeGenerator().generateFromString(dstString).getRoot();
 
                     System.out.println(treeGenerator.getClass().getName() + " : " + repositoryPath + " : " + commit.getName() + " : " + diff.getOldPath());
-                    System.out.println("(JDT) GumTree: " + runGumTree(srcTreeJdt, dstTreeJdt));
-                    System.out.println("(JDT) RTED: " + RTEDCalculator.caclulateRTEDValue(srcTreeJdt, dstTreeJdt));
-                    System.out.println("(JDT) ChangeDistiller: " + runGumTree(srcTreeJdt, dstTreeJdt));
-                    System.out.println("(CD) ChangeDistiller: " + runChangeDistiller(srcTreeCD, dstTreeCD));
-                    System.out.println("(CD) GumTree: " + runGumTree(srcTreeCD, dstTreeCD));
+                    int gumTreeScore = runGumTree(srcTreeJdt, dstTreeJdt);
+                    System.out.println("(JDT) GumTree: " + gumTreeScore);
+                    double rtedScore = RTEDCalculator.caclulateRTEDValue(srcTreeJdt, dstTreeJdt);
+                    System.out.println("(JDT) RTED: " + rtedScore);
+                    int changeDistillerScore = runChangeDistiller(srcTreeJdt, dstTreeJdt);
+                    System.out.println("(JDT) ChangeDistiller: " + changeDistillerScore);
+                    //System.out.println("(CD) ChangeDistiller: " + runChangeDistiller(srcTreeCD, dstTreeCD));
+                    //System.out.println("(CD) GumTree: " + runGumTree(srcTreeCD, dstTreeCD));
+
+                    stats.addEntry(gumTreeScore, rtedScore, changeDistillerScore);
                 }
                 catch (Exception e){
                     System.out.println("Something somewhere went wrong. Ooopsi!");
@@ -83,6 +91,7 @@ public class GumTreeRunner {
             }
 
         }
+        stats.printStats();
 
     }
 
