@@ -16,8 +16,8 @@ import java.util.List;
 public class GumTreeRunner {
 
     public static void main(String[] args) throws IOException {
-        String file1 = "inputfiles/GumTreeRunner.java";
-        String file2 = "inputfiles/GumTreeRunner_dst.java";
+        String file1 = "src/main/java/GumTreeRunner.java";
+        String file2 = file1;
 
         //JDT Tree
         ITree srcTree = new JdtTreeGenerator().generateFromFile(file1).getRoot();
@@ -25,7 +25,14 @@ public class GumTreeRunner {
 
         runGumTree(srcTree, dstTree);
 
-        System.out.println("TED: " + RTEDCalculator.caclulateRTEDValue(srcTree, dstTree));
+        String srcTreeString = convertITreeToString(srcTree);
+        String dstTreeString = convertITreeToString(dstTree);
+
+        RTED_InfoTree_Opt rted = new RTED_InfoTree_Opt(1, 1, 1);
+        LblTree ltSrc = LblTree.fromString(srcTreeString);
+        LblTree ltDst = LblTree.fromString(dstTreeString);
+        rted.init(ltSrc, ltDst);
+
     }
 
     public static int runGumTree(ITree srcTree, ITree dstTree){
@@ -36,6 +43,19 @@ public class GumTreeRunner {
         g.generate();
         List<Action> actions = g.getActions(); // return the actions
         return actions.size();
+    }
+
+    public static String convertITreeToString(ITree tree) {
+
+        String pre = "{";
+        String childs = "";
+        String post = "}";
+
+        for (ITree child : tree.getChildren()) {
+            childs += convertITreeToString(child);
+        }
+
+        return pre + tree.getLabel() + childs + post;
     }
 
 }
