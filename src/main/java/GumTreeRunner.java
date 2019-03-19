@@ -18,11 +18,11 @@ public class GumTreeRunner {
 
     public static void main(String[] args) throws IOException {
 
-        //analyzeRepo("/home/phmoll/Documents/RTED/LIRE/");
-        analyzeRepo("/home/phmoll/Documents/RTED/LIRE");
-
-
-
+        if(args.length != 1){
+            System.out.println("Invalid args");
+            System.exit(1);
+        }
+        analyzeRepo(args[0]);
     }
 
     public static int runGumTree(ITree srcTree, ITree dstTree){
