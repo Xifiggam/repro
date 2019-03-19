@@ -1,7 +1,11 @@
 import com.github.gumtreediff.actions.ActionGenerator;
 import com.github.gumtreediff.actions.model.Action;
+import com.github.gumtreediff.gen.TreeGenerator;
 import com.github.gumtreediff.gen.jdt.AbstractJdtTreeGenerator;
 import com.github.gumtreediff.gen.jdt.JdtTreeGenerator;
+import com.github.gumtreediff.gen.jdt.cd.CdJdtTreeGenerator;
+import com.github.gumtreediff.matchers.CompositeMatchers;
+import com.github.gumtreediff.matchers.MappingStore;
 import com.github.gumtreediff.matchers.Matcher;
 import com.github.gumtreediff.matchers.Matchers;
 import com.github.gumtreediff.tree.ITree;
@@ -55,17 +59,41 @@ public class GumTreeRunner {
             List<DiffEntry> diffs = GitHelper.getDiffs(repository, commit, commit.getParent(0));
             for (DiffEntry diff : diffs) {
 
-                String srcString = GitHelper.getFileContent(diff.getOldId(), repository);
-                String dstString = GitHelper.getFileContent(diff.getNewId(), repository);
-                ITree srcTree = new JdtTreeGenerator().generateFromString(srcString).getRoot();
-                ITree dstTree = new JdtTreeGenerator().generateFromString(dstString).getRoot();
-                System.out.println(treeGenerator.getClass().getName()+ " : " + repositoryPath + " : " + commit.getName()  + " : " +  diff.getOldPath());
-                System.out.println("GumTree: " + runGumTree(srcTree, dstTree));
-                System.out.println("RTED: " + RTEDCalculator.caclulateRTEDValue(srcTree, dstTree));
+                try {
+                    String srcString = GitHelper.getFileContent(diff.getOldId(), repository);
+                    String dstString = GitHelper.getFileContent(diff.getNewId(), repository);
+
+                    ITree srcTreeJdt = new JdtTreeGenerator().generateFromString(srcString).getRoot();
+                    ITree dstTreeJdt = new JdtTreeGenerator().generateFromString(dstString).getRoot();
+
+                    ITree srcTreeCD = new CdJdtTreeGenerator().generateFromString(srcString).getRoot();
+                    ITree dstTreeCD = new CdJdtTreeGenerator().generateFromString(dstString).getRoot();
+
+                    System.out.println(treeGenerator.getClass().getName() + " : " + repositoryPath + " : " + commit.getName() + " : " + diff.getOldPath());
+                    System.out.println("(JDT) GumTree: " + runGumTree(srcTreeJdt, dstTreeJdt));
+                    System.out.println("(JDT) RTED: " + RTEDCalculator.caclulateRTEDValue(srcTreeJdt, dstTreeJdt));
+                    System.out.println("(JDT) ChangeDistiller: " + runGumTree(srcTreeJdt, dstTreeJdt));
+                    System.out.println("(CD) ChangeDistiller: " + runChangeDistiller(srcTreeCD, dstTreeCD));
+                    System.out.println("(CD) GumTree: " + runGumTree(srcTreeCD, dstTreeCD));
+                }
+                catch (Exception e){
+                    System.out.println("Something somewhere went wrong. Ooopsi!");
+                    e.printStackTrace();
+                }
             }
 
         }
 
+    }
+
+    private static int runChangeDistiller(ITree srcTree, ITree dstTree) {
+        //Run.initGenerators();
+        Matcher m = new CompositeMatchers.ChangeDistiller(srcTree,dstTree, new MappingStore());
+        m.match();
+        ActionGenerator g = new ActionGenerator(srcTree, dstTree, m.getMappings());
+        g.generate();
+        List<Action> actions = g.getActions(); // return the actions
+        return actions.size();
     }
 
 
